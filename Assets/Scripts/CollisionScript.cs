@@ -6,10 +6,12 @@ public class CollisionScript : MonoBehaviour
     [SerializeField] private float destroyDelay = 2f;
     private Coroutine destroyCoroutine;
     public Animator anim;
+    AudioSource m_MyAudioSource;
 
     void Start()
     {
         anim = GetComponent<Animator>();
+        m_MyAudioSource = GetComponent<AudioSource>();
     }
 
     private void OnTriggerEnter(Collider other)
@@ -30,6 +32,7 @@ public class CollisionScript : MonoBehaviour
                 StopCoroutine(destroyCoroutine);
                 destroyCoroutine = null;
                 anim.SetBool("isRumbling", false);
+                m_MyAudioSource.Stop();                
             }
         }
     }
@@ -37,6 +40,7 @@ public class CollisionScript : MonoBehaviour
     private IEnumerator DestroyAfterDelay()
     {
         anim.SetBool("isRumbling", true);
+        m_MyAudioSource.Play();
         yield return new WaitForSeconds(destroyDelay);
         Destroy(gameObject);
     }
