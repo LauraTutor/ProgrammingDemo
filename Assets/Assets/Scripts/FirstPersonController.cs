@@ -6,11 +6,11 @@ public class FirstPersonController : MonoBehaviour
 {
 
     [Header("Movement Speeds")]
-    [SerializeField] private float walkSpeed = 3.0f;
-    [SerializeField] private float sprintMultiplier = 2.0f;
+    [SerializeField] public float walkSpeed = 3.0f;
+    [SerializeField] public float sprintMultiplier = 2.0f;
     
     [Header("Jump Parameters")]
-    [SerializeField] private float jumpForce = 5.0f;
+    [SerializeField] public float jumpForce = 5.0f;
     [SerializeField] private float gravityMultiplier = 1.0f;
     
     [Header("Look Parameters")]
