@@ -19341,7 +19341,7 @@ GameObject:
   - component: {fileID: 540313721}
   - component: {fileID: 540313720}
   - component: {fileID: 540313719}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Capsule
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -21173,7 +21173,7 @@ GameObject:
   - component: {fileID: 822963223}
   - component: {fileID: 822963222}
   - component: {fileID: 822963221}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Player
   m_TagString: Player
   m_Icon: {fileID: 0}
@@ -22165,7 +22165,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1037398381}
   - component: {fileID: 1037398380}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: CinemachineCamera
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -36230,16 +36230,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7eb2372bc6f34164183d80ad06ff6f5e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  wanderRadius: 10
-  wanderTimer: 5
+  agent: {fileID: 1316677253}
   player: {fileID: 822963223}
-  detectionRange: 10
-  stopDistance: 0.5
-  moveSpeed: 3
-  fieldOfView: 90
-  obstacleMask:
-    serializedVersion: 2
-    m_Bits: 0
+  walkPoint: {x: 0, y: 0, z: 0}
+  walkPointRange: 5
+  sightRange: 5
+  visionAngle: 90
 --- !u!1001 &1320504098
 PrefabInstance:
   m_ObjectHideFlags: 0

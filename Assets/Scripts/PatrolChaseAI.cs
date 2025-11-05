@@ -1,123 +1,110 @@
 using UnityEngine;
-using System.Collections;
 using UnityEngine.AI;
 
 public class PatrolChaseAI : MonoBehaviour
 {
-    [Header("Patrol Settings")]
-    public float wanderRadius = 10f;
-    public float wanderTimer = 5f;
-
-    [Header("Player Detection")]
+    public NavMeshAgent agent;
     public Transform player;
-    public float detectionRange = 10f;
-    public float stopDistance = 1.5f;
-    public float moveSpeed = 3f;
-    public float fieldOfView = 90f;
-    public LayerMask obstacleMask;
 
-    private NavMeshAgent agent;
-    private float timer;
-    private bool chasingPlayer = false;
+    // Patrolling
+    public Vector3 walkPoint;
+    bool walkPointSet;
+    public float walkPointRange = 10f;
 
-    void OnEnable()
+    // Vision
+    public float sightRange = 10f;
+    public float visionAngle = 90f;
+    private bool playerInSight;
+
+    private void Awake()
     {
+        // Find player by tag
+        GameObject playerObj = GameObject.FindWithTag("Player");
+        if (playerObj != null)
+            player = playerObj.transform;
+        else
+            Debug.LogError("Player tag not found in the scene!");
+
         agent = GetComponent<NavMeshAgent>();
-        if (agent != null)
-        {
-            agent.stoppingDistance = stopDistance;
-            agent.speed = moveSpeed;
-        }
-        timer = wanderTimer;
     }
 
-    void Update()
+    private void Update()
     {
-        if (player == null) return;
+        CheckPlayerInSight();
 
-        float distanceToPlayer = Vector3.Distance(transform.position, player.position);
-        bool canSeePlayer = CanSeePlayer(distanceToPlayer);
+        if (playerInSight)
+            ChasePlayer();
+        else
+            Patroling();
 
-        // Check if player is within detection range and visible
-        chasingPlayer = canSeePlayer && distanceToPlayer <= detectionRange;
+        FaceMovementDirection();
+    }
 
-        if (chasingPlayer)
+    private void Patroling()
+    {
+        if (!walkPointSet) SearchWalkPoint();
+
+        if (walkPointSet)
+            agent.SetDestination(walkPoint);
+
+        Vector3 distanceToWalkPoint = transform.position - walkPoint;
+        if (distanceToWalkPoint.magnitude < 1f)
+            walkPointSet = false;
+    }
+
+    private void SearchWalkPoint()
+    {
+        // Pick a random point within walkPointRange
+        Vector3 randomDirection = Random.insideUnitSphere * walkPointRange;
+        randomDirection += transform.position;
+
+        // Find nearest point on NavMesh
+        NavMeshHit hit;
+        if (NavMesh.SamplePosition(randomDirection, out hit, walkPointRange, NavMesh.AllAreas))
         {
-            FaceTarget(player.position);
-            Vector3 direction = (player.position - transform.position).normalized;
-            direction.y = 0; // prevent floating
-            if (distanceToPlayer > stopDistance)
-            {
-                transform.position += direction * moveSpeed * Time.deltaTime;
-            }
-
-            // Face the player
-            if (direction.magnitude > 0.1f)
-            {
-                Quaternion lookRotation = Quaternion.LookRotation(direction);
-                transform.rotation = Quaternion.Slerp(transform.rotation, lookRotation, Time.deltaTime * 5f);
-            }
-            else
-            {
-                // Patrol randomly
-                timer += Time.deltaTime;
-                if (timer >= wanderTimer)
-                {
-                    Vector3 newPos = RandomNavSphere(transform.position, wanderRadius, -1);
-                    agent.SetDestination(newPos);
-                    timer = 0;
-                }
-            }
+            walkPoint = hit.position;
+            walkPointSet = true;
         }
     }
 
-    // Smoothly rotate to face the target
-    private void FaceTarget(Vector3 targetPos)
+    private void CheckPlayerInSight()
     {
-        Vector3 direction = (targetPos - transform.position).normalized;
-        direction.y = 0;
-        if (direction != Vector3.zero)
+        if (player == null)
         {
-            Quaternion lookRotation = Quaternion.LookRotation(direction);
-            transform.rotation = Quaternion.Slerp(transform.rotation, lookRotation, Time.deltaTime * 5f);
+            playerInSight = false;
+            return;
         }
-    }
 
-    // Check if the player is in FOV and not blocked by obstacles
-    private bool CanSeePlayer(float distanceToPlayer)
-    {
-        Vector3 directionToPlayer = (player.position - transform.position).normalized;
-        float angle = Vector3.Angle(transform.forward, directionToPlayer);
+        Vector3 directionToPlayer = player.position - transform.position;
+        float distance = directionToPlayer.magnitude;
 
-        if (angle < fieldOfView / 2f)
+        if (distance <= sightRange)
         {
-            if (!Physics.Raycast(transform.position + Vector3.up, directionToPlayer, distanceToPlayer, obstacleMask))
+            float angle = Vector3.Angle(transform.forward, directionToPlayer);
+            if (angle <= visionAngle / 2)
             {
-                return true;
+                // Optional: add raycast to check obstacles
+                playerInSight = true;
+                return;
             }
         }
-        return false;
+
+        playerInSight = false;
     }
 
-    // Get a random point for patrolling
-    public static Vector3 RandomNavSphere(Vector3 origin, float dist, int layermask)
+    private void ChasePlayer()
     {
-        Vector3 randDirection = Random.insideUnitSphere * dist + origin;
-        NavMeshHit navHit;
-        NavMesh.SamplePosition(randDirection, out navHit, dist, layermask);
-        return navHit.position;
+        if (player != null)
+            agent.SetDestination(player.position);
     }
 
-    // Debug visualization
-    void OnDrawGizmosSelected()
+    private void FaceMovementDirection()
     {
-        Gizmos.color = Color.yellow;
-        Gizmos.DrawWireSphere(transform.position, detectionRange);
-
-        Vector3 leftLimit = Quaternion.Euler(0, -fieldOfView / 2, 0) * transform.forward;
-        Vector3 rightLimit = Quaternion.Euler(0, fieldOfView / 2, 0) * transform.forward;
-        Gizmos.color = Color.blue;
-        Gizmos.DrawRay(transform.position, leftLimit * detectionRange);
-        Gizmos.DrawRay(transform.position, rightLimit * detectionRange);
+        if (agent.velocity.sqrMagnitude > 0.1f)
+        {
+            Vector3 lookDirection = agent.velocity.normalized;
+            lookDirection.y = 0;
+            transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(lookDirection), Time.deltaTime * 5f);
+        }
     }
 }
