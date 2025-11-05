@@ -20935,10 +20935,10 @@ PrefabInstance:
       addedObject: {fileID: 1316677250}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 0cd8ba6c25ba0ae438e3cf15d9b7be9d, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 1316677252}
+      addedObject: {fileID: 1316677253}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 0cd8ba6c25ba0ae438e3cf15d9b7be9d, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 1316677253}
+      addedObject: {fileID: 1316677255}
   m_SourcePrefab: {fileID: 100100000, guid: 0cd8ba6c25ba0ae438e3cf15d9b7be9d, type: 3}
 --- !u!1 &739934819 stripped
 GameObject:
@@ -28617,7 +28617,7 @@ GameObject:
   - component: {fileID: 1305001117}
   - component: {fileID: 1305001116}
   - component: {fileID: 1305001115}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Cube (3)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -36140,7 +36140,7 @@ MonoBehaviour:
   m_OverrideTileSize: 0
   m_TileSize: 256
   m_OverrideVoxelSize: 0
-  m_VoxelSize: 0.1
+  m_VoxelSize: 0.16666667
   m_MinRegionArea: 2
   m_NavMeshData: {fileID: 23800000, guid: 5fb8206d0c12dcc40a285fe796849df8, type: 2}
   m_BuildHeightMesh: 0
@@ -36196,23 +36196,6 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
---- !u!114 &1316677252
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1316677249}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6b67627eeb1324b4f8ed5db6dc738554, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  patrolRange: 10
-  waitTime: 1
-  detectionRange: 8
-  fieldOfView: 90
-  loseSightTime: 2
 --- !u!195 &1316677253
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -36235,6 +36218,28 @@ NavMeshAgent:
   m_BaseOffset: 0
   m_WalkableMask: 4294967295
   m_ObstacleAvoidanceType: 4
+--- !u!114 &1316677255
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1316677249}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7eb2372bc6f34164183d80ad06ff6f5e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  wanderRadius: 10
+  wanderTimer: 5
+  player: {fileID: 822963223}
+  detectionRange: 10
+  stopDistance: 0.5
+  moveSpeed: 3
+  fieldOfView: 90
+  obstacleMask:
+    serializedVersion: 2
+    m_Bits: 0
 --- !u!1001 &1320504098
 PrefabInstance:
   m_ObjectHideFlags: 0
