@@ -1,118 +1,151 @@
 using UnityEngine;
 using UnityEngine.AI;
+using System.Collections;
 
 public class PatrollingAI : MonoBehaviour
 {
-    [Header("Patrol Settings")]
-    public float wanderRadius = 10f;
-    public float wanderTimer = 5f;
+    private NavMeshAgent nav;
 
-    [Header("Player Detection")]
-    public Transform player;
-    public float detectionRange = 10f;
-    public float loseSightRange = 15f;
-    public float fieldOfView = 90f;
-    public LayerMask obstacleMask; // assign your walls/obstacles layer
+    [Header("AI Settings")]
+    public float patrolRadius = 15f;
+    public float startWaitTime = 1f;
 
-    private NavMeshAgent agent;
-    private float timer;
-    private bool chasingPlayer = false;
+    [Header("Vision Settings")]
+    public float viewRadius = 10f;
+    [Range(0, 360)]
+    public float viewAngle = 90f;
 
-    void OnEnable()
+    private float waitTime;
+    private Vector3 randomPatrolPoint;
+
+    private Transform player;
+    private bool canSeePlayer;
+
+    void Awake()
     {
-        agent = GetComponent<NavMeshAgent>();
-        timer = wanderTimer;
+        nav = GetComponent<NavMeshAgent>();
+        nav.enabled = true;
+    }
+
+    void Start()
+    {
+        waitTime = startWaitTime;
+        randomPatrolPoint = GetRandomPointOnNavMesh(transform.position, patrolRadius);
+        nav.SetDestination(randomPatrolPoint);
+
+        GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
+        if (playerObj != null)
+            player = playerObj.transform;
+
+        StartCoroutine(FOVRoutine());
     }
 
     void Update()
     {
-        if (player == null) return;
-
-        float distanceToPlayer = Vector3.Distance(transform.position, player.position);
-        bool canSeePlayer = CanSeePlayer(distanceToPlayer);
-
-        // --- Detection Logic ---
-        if (canSeePlayer && distanceToPlayer <= detectionRange)
-        {
-            chasingPlayer = true;
-        }
-        else if (distanceToPlayer >= loseSightRange)
-        {
-            chasingPlayer = false;
-        }
-
-        // --- Behavior ---
-        if (chasingPlayer)
+        if (canSeePlayer && player != null)
         {
             // Chase the player
-            agent.SetDestination(player.position);
-            FaceTarget(player.position);
+            nav.SetDestination(player.position);
         }
         else
         {
-            // Patrol normally
-            timer += Time.deltaTime;
-            if (timer >= wanderTimer)
+            // Patrol behavior
+            if (!nav.pathPending && nav.remainingDistance <= nav.stoppingDistance)
             {
-                Vector3 newPos = RandomNavSphere(transform.position, wanderRadius, -1);
-                agent.SetDestination(newPos);
-                timer = 0;
+                if (waitTime <= 0)
+                {
+                    randomPatrolPoint = GetRandomPointOnNavMesh(transform.position, patrolRadius);
+                    nav.SetDestination(randomPatrolPoint);
+                    waitTime = startWaitTime;
+                }
+                else
+                {
+                    waitTime -= Time.deltaTime;
+                }
             }
         }
     }
 
-    // --- Rotate smoothly to face player while chasing ---
-    private void FaceTarget(Vector3 targetPos)
+    Vector3 GetRandomPointOnNavMesh(Vector3 center, float radius)
     {
-        Vector3 direction = (targetPos - transform.position).normalized;
-        direction.y = 0;
-        if (direction != Vector3.zero)
+        Vector3 randomPos = center + Random.insideUnitSphere * radius;
+        NavMeshHit hit;
+
+        if (NavMesh.SamplePosition(randomPos, out hit, radius, NavMesh.AllAreas))
+            return hit.position;
+
+        // Retry if not found
+        return GetRandomPointOnNavMesh(center, radius);
+    }
+
+    IEnumerator FOVRoutine()
+    {
+        WaitForSeconds wait = new WaitForSeconds(0.2f);
+
+        while (true)
         {
-            Quaternion lookRotation = Quaternion.LookRotation(direction);
-            transform.rotation = Quaternion.Slerp(transform.rotation, lookRotation, Time.deltaTime * 5f);
+            yield return wait;
+            FieldOfViewCheck();
         }
     }
 
-    // --- Vision Check (Raycast + FOV) ---
-    private bool CanSeePlayer(float distanceToPlayer)
+    void FieldOfViewCheck()
     {
-        Vector3 directionToPlayer = (player.position - transform.position).normalized;
-        float angle = Vector3.Angle(transform.forward, directionToPlayer);
+        if (player == null) return;
 
-        if (angle < fieldOfView / 2f)
+        Vector3 rayOrigin = transform.position + Vector3.up * 1.5f;
+        Vector3 targetPoint = player.position + Vector3.up;
+        Vector3 directionToPlayer = (targetPoint - rayOrigin).normalized;
+
+        float distanceToPlayer = Vector3.Distance(rayOrigin, targetPoint);
+
+        // Draw debug line (yellow = checking)
+        Debug.DrawLine(rayOrigin, targetPoint, Color.yellow);
+
+        if (distanceToPlayer <= viewRadius)
         {
-            if (!Physics.Raycast(transform.position + Vector3.up, directionToPlayer, distanceToPlayer, obstacleMask))
+            float angle = Vector3.Angle(transform.forward, directionToPlayer);
+            if (angle <= viewAngle / 2f)
             {
-                return true; // Player visible
+                // Only consider an obstacle if ray hits something *other than player*
+                if (Physics.Raycast(rayOrigin, directionToPlayer, out RaycastHit hit, distanceToPlayer))
+                {
+                    if (hit.transform.CompareTag("Player"))
+                    {
+                        canSeePlayer = true;
+                        Debug.DrawLine(rayOrigin, targetPoint, Color.red); // Red = detected
+                        return;
+                    }
+                }
             }
         }
-        return false;
+
+        canSeePlayer = false;
     }
 
-    // --- Get random patrol point ---
-    public static Vector3 RandomNavSphere(Vector3 origin, float dist, int layermask)
-    {
-        Vector3 randDirection = Random.insideUnitSphere * dist;
-        randDirection += origin;
-
-        NavMeshHit navHit;
-        NavMesh.SamplePosition(randDirection, out navHit, dist, layermask);
-
-        return navHit.position;
-    }
-
-    // --- Debug visualization ---
     void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.yellow;
-        Gizmos.DrawWireSphere(transform.position, detectionRange);
-        Gizmos.color = Color.red;
-        Gizmos.DrawWireSphere(transform.position, loseSightRange);
+        Gizmos.DrawWireSphere(transform.position, viewRadius);
 
-        Vector3 leftLimit = Quaternion.Euler(0, -fieldOfView / 2, 0) * transform.forward;
-        Vector3 rightLimit = Quaternion.Euler(0, fieldOfView / 2, 0) * transform.forward;
+        Vector3 angleA = DirectionFromAngle(-viewAngle / 2, false);
+        Vector3 angleB = DirectionFromAngle(viewAngle / 2, false);
+
         Gizmos.color = Color.blue;
-        Gizmos.DrawRay(transform.position, leftLimit * detectionRange);
-        Gizmos.DrawRay(transform.position, rightLimit * detectionRange);
+        Gizmos.DrawLine(transform.position, transform.position + angleA * viewRadius);
+        Gizmos.DrawLine(transform.position, transform.position + angleB * viewRadius);
+
+        if (canSeePlayer && player != null)
+        {
+            Gizmos.color = Color.red;
+            Gizmos.DrawLine(transform.position, player.position);
+        }
+    }
+
+    Vector3 DirectionFromAngle(float angleInDegrees, bool global)
+    {
+        if (!global)
+            angleInDegrees += transform.eulerAngles.y;
+        return new Vector3(Mathf.Sin(angleInDegrees * Mathf.Deg2Rad), 0, Mathf.Cos(angleInDegrees * Mathf.Deg2Rad));
     }
 }
