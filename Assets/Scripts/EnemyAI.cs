@@ -49,6 +49,7 @@ public class EnemyAI : MonoBehaviour
         // Update isMoving animation
         bool moving = agent.velocity.magnitude > 0.2f;
         animator.SetBool("isMoving", moving);
+        Debug.Log("boolactive");
     }
 
     void Patrol()
