@@ -3,9 +3,9 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
-public class ButtonManagerMM : MonoBehaviour
+public class WinPanel : MonoBehaviour
 {
-    public Button startButton;
+    public Button menuButton;
     public Button quitButton;
     public Image fadeImage; // Assign this in the Inspector
 
@@ -14,12 +14,11 @@ public class ButtonManagerMM : MonoBehaviour
 
     private void Start()
     {
-        startButton.onClick.AddListener(() => StartCoroutine(StartGameRoutine(1)));
+        menuButton.onClick.AddListener(() => StartCoroutine(StartGameRoutine(1)));
         quitButton.onClick.AddListener(QuitGame);
 
         if (fadeImage != null)
         {
-            // Ensure the image starts invisible and inactive
             Color c = fadeImage.color;
             c.a = 0f;
             fadeImage.color = c;
@@ -47,7 +46,11 @@ public class ButtonManagerMM : MonoBehaviour
             yield return new WaitForSeconds(delayBeforeLoad);
         }
 
-        SceneManager.LoadScene(sceneIndex);
+        int previousSceneIndex = SceneManager.GetActiveScene().buildIndex - 1;
+        if (previousSceneIndex >= 0)
+        {
+            StartCoroutine(StartGameRoutine(previousSceneIndex));
+        }
     }
 
     public void QuitGame()
