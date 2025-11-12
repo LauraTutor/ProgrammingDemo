@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-public class PlayerInputHandler : MonoBehaviour
+public class PlayerInputHandlerROB : MonoBehaviour
 {
 
     [Header("Input Action Asset")]

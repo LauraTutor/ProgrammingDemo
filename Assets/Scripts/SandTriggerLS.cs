@@ -1,8 +1,8 @@
 using UnityEngine;
 
-public class SandTrigger : MonoBehaviour
+public class SandTriggerLS : MonoBehaviour
 {
-    private FirstPersonController firstPersonController;
+    private FirstPersonControllerROB firstPersonController;
 
     private float originalWalkSpeed;
     private float originalSprintMultiplier;
@@ -13,7 +13,7 @@ public class SandTrigger : MonoBehaviour
         if (other.CompareTag("Player"))
         {
             // Get the player's controller
-            firstPersonController = other.GetComponent<FirstPersonController>();
+            firstPersonController = other.GetComponent<FirstPersonControllerROB>();
             if (firstPersonController != null)
             {
                 // Store original values

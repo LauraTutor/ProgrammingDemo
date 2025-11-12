@@ -3,23 +3,28 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
-public class ButtonManagerMM : MonoBehaviour
+public class LosePanelLS : MonoBehaviour
 {
-    public Button startButton;
+    public Button tryagainButton;
+    public Button menuButton;
     public Button quitButton;
-    public Image fadeImage; // Assign this in the Inspector
+    public Image fadeImage;
 
-    public float fadeDuration = 1.5f; // Time it takes to fade in
-    public float delayBeforeLoad = 0.5f; // Delay after fade before loading
+    [Header("Scene Settings")]
+    public string MainMenu = "MainMenu";
+
+    [Header("Fade Settings")]
+    public float fadeDuration = 1.5f;
+    public float delayBeforeLoad = 0.5f;
 
     private void Start()
     {
-        startButton.onClick.AddListener(() => StartCoroutine(StartGameRoutine(1)));
+        tryagainButton.onClick.AddListener(RestartGame);
+        menuButton.onClick.AddListener (LoadScene);
         quitButton.onClick.AddListener(QuitGame);
 
         if (fadeImage != null)
         {
-            // Ensure the image starts invisible and inactive
             Color c = fadeImage.color;
             c.a = 0f;
             fadeImage.color = c;
@@ -27,7 +32,7 @@ public class ButtonManagerMM : MonoBehaviour
         }
     }
 
-    private IEnumerator StartGameRoutine(int sceneIndex)
+    private IEnumerator LoadSceneRoutine(string scene)
     {
         if (fadeImage != null)
         {
@@ -36,6 +41,7 @@ public class ButtonManagerMM : MonoBehaviour
             float elapsed = 0f;
             Color c = fadeImage.color;
 
+            // Fade to black
             while (elapsed < fadeDuration)
             {
                 elapsed += Time.deltaTime;
@@ -46,8 +52,17 @@ public class ButtonManagerMM : MonoBehaviour
 
             yield return new WaitForSeconds(delayBeforeLoad);
         }
+    }
 
-        SceneManager.LoadScene(sceneIndex);
+    public void LoadScene()
+    {
+        SceneManager.LoadScene("MainMenu");
+    }
+    
+    private void RestartGame()
+    {
+        Scene currentScene = SceneManager.GetActiveScene();
+        StartCoroutine(LoadSceneRoutine(currentScene.name)); // use coroutine for fade
     }
 
     public void QuitGame()

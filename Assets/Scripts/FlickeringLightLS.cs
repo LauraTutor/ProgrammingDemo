@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class FlickeringLight : MonoBehaviour
+public class FlickeringLightLS : MonoBehaviour
 {
     public Light lightSource;
     public float minIntensity = 0.5f;  // Minimum light intensity

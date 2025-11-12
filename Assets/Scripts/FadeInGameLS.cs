@@ -2,7 +2,7 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class FadeInGame : MonoBehaviour
+public class FadeInGameLS : MonoBehaviour
 {
     public Image fadeImage;
     public float fadeDuration = 1.5f;

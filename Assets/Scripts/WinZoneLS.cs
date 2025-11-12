@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class WinZone : MonoBehaviour
+public class WinZoneLS : MonoBehaviour
 {
     public GameObject player;
     public GameObject winPanel;

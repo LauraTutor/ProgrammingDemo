@@ -1,7 +1,7 @@
 using UnityEngine;
 using System.Collections;
 
-public class CollisionScript : MonoBehaviour
+public class CollisionScriptLS : MonoBehaviour
 {
     [SerializeField] private float destroyDelay = 2f;  // Time before "disappearing"
     [SerializeField] private float respawnDelay = 30f; // Time before respawn

@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class LightOnOff : MonoBehaviour
+public class LightOnOffLS : MonoBehaviour
 {
     public Light targetLight;
     public string playerTag = "Player";

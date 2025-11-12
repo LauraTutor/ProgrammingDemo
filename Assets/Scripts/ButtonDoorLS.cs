@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class ButtonDoor : MonoBehaviour
+public class ButtonDoorLS : MonoBehaviour
 {
     public Animator anim;
     AudioSource m_MyAudioSource;

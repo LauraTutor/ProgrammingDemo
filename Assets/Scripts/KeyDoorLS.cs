@@ -1,7 +1,7 @@
 using UnityEngine;
 using System.Collections;
 
-public class KeyDoor : MonoBehaviour
+public class KeyDoorLS : MonoBehaviour
 {
     // Assign these in the Inspector
     public GameObject keyObject;

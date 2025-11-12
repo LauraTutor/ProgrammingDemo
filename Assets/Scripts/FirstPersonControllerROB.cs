@@ -2,7 +2,7 @@ using System;
 using UnityEngine;
 using Unity.Cinemachine; //You need to add this for Cinemachine
 
-public class FirstPersonController : MonoBehaviour
+public class FirstPersonControllerROB : MonoBehaviour
 {
 
     [Header("Movement Speeds")]
@@ -20,7 +20,7 @@ public class FirstPersonController : MonoBehaviour
     [Header("References")]
     [SerializeField] private CharacterController characterController;
     [SerializeField] private CinemachineCamera mainCamera; //you need to change this to CinemachineCamera
-    [SerializeField] private PlayerInputHandler playerInputHandler;
+    [SerializeField] private PlayerInputHandlerROB playerInputHandler;
 
     private Vector3 currentMovement;
     private float verticalRotation;

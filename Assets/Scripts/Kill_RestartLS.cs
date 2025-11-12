@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public class Kill_Restart : MonoBehaviour
+public class Kill_RestartLS : MonoBehaviour
 {
     private void OnTriggerEnter(Collider other)
     {

@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.AI;
 
-public class EnemyAI : MonoBehaviour
+public class EnemyAILS : MonoBehaviour
 {
     [Header("References")]
     public Transform player;

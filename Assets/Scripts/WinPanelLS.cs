@@ -3,7 +3,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
-public class WinPanel : MonoBehaviour
+public class WinPanelLS : MonoBehaviour
 {
     public Button menuButton;
     public Button quitButton;
