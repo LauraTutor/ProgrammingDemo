@@ -28,16 +28,13 @@ public class EnemyAILS : MonoBehaviour
     {
         float distanceToPlayer = Vector3.Distance(transform.position, player.position);
 
-        // Determine behavior
         if (distanceToPlayer <= detectionRange)
         {
-            // Chase player
             isPatrolling = false;
             agent.SetDestination(player.position);
         }
         else
         {
-            // Patrol mode
             if (!isPatrolling)
             {
                 isPatrolling = true;
@@ -46,10 +43,8 @@ public class EnemyAILS : MonoBehaviour
             Patrol();
         }
 
-        // Update isMoving animation
         bool moving = agent.velocity.magnitude > 0.2f;
         animator.SetBool("isMoving", moving);
-        Debug.Log("boolactive");
     }
 
     void Patrol()
