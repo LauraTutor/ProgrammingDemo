@@ -19,16 +19,11 @@ public class WinPanelLS : MonoBehaviour
         quitButton.onClick.AddListener(QuitGame);
     }
 
-public void LoadScene()
-{
-    SceneManager.LoadScene("MainMenuLS");
-}
-
-public void RestartGame()
-{
-    SceneManager.LoadScene("Level1LS");
-}
-
+    public void LoadScene()
+    {
+        SceneManager.LoadScene("MainMenuLS");
+    }
+    
     public void QuitGame()
     {
         Application.Quit();
